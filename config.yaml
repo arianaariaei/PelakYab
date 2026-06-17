@@ -1,0 +1,105 @@
+# ============================================================================
+#  PelakYab  —  configuration
+#  Edit values here; nothing in the code needs changing for normal use.
+# ============================================================================
+
+camera:
+  # ---- How to connect a camera. Three options: --------------------------
+  #  1) "browser"  -> APP-FREE phone camera. The PC shows a QR code; scan it
+  #                   with the phone's normal camera, the link opens in the
+  #                   browser, and the phone streams its camera in. No app to
+  #                   install. (Recommended for handing the project to someone.)
+  #  2) IP Webcam  -> URL of the Android "IP Webcam" app (Start server), e.g.
+  #                   http://192.168.1.50:8080
+  #  3) "0","1"... -> a local USB/built-in webcam index (no phone).
+  source: "browser"
+
+  # Settings for source: "browser"
+  browser:
+    # BEST for Iran: host the relay (relay/server.py) on a free Iranian PaaS
+    # (Liara/RunFlare) and put its URL here. Both phone and laptop dial OUT to
+    # it -> works on filtered networks, real cert (no "proceed" tap), static URL,
+    # no firewall. When set, this overrides tunnel/LAN. See relay/README.md.
+    # relay_url: "https://pelakyab-relay.liara.run"
+    # tunnel: true  -> the phone connects via a public HTTPS link (cloudflared).
+    #   Works from anywhere (cellular / any Wi-Fi), no firewall, NO security
+    #   warning. Needs the PC to have internet (e.g. the phone's hotspot).
+    #   cloudflared is auto-downloaded once into tools/.
+    # tunnel: false -> direct on the SAME network (e.g. the phone's HOTSPOT):
+    #   self-signed cert -> the phone shows a one-time "proceed" tap; run
+    #   allow_phone_camera.bat once. This is the reliable path in Iran.
+    tunnel: false
+    # Which public-link provider to use when tunnel:true:
+    #   auto         -> try localhost.run (SSH, no account) then Cloudflare
+    #   localhostrun -> only localhost.run (best on networks that block Cloudflare)
+    #   cloudflare   -> only Cloudflare
+    # If all fail, it auto-falls back to same-Wi-Fi.
+    tunnel_provider: auto
+    port: 8443           # local server port (also the LAN port when tunnel:false)
+    # host_ip: null      # auto-detected LAN IP; only used when tunnel:false
+
+  stream_path: "/video"        # MJPEG stream endpoint of IP Webcam
+  snapshot_path: "/shot.jpg"   # single-frame fallback endpoint
+  torch_on_path: "/enabletorch"
+  torch_off_path: "/disabletorch"
+  # Optional one-shot focus / quality tuning pushed to the phone on connect:
+  #   /settings/quality?set=90  /focus  etc. (left empty by default)
+  on_connect_requests: []
+  reconnect_delay: 2.0         # seconds to wait before reconnecting a dropped stream
+  read_timeout: 5.0
+  # Fix phone orientation here (IP Webcam doesn't auto-rotate the stream).
+  # rotate: 0 / 90 / 180 / 270  (clockwise). You can also rotate live in the GUI.
+  rotate: 0
+  flip: ""                     # "" | "h" | "v" | "hv"  (mirror if needed)
+
+detection:
+  device: "cuda:0"             # "cuda:0" for GPU, or "cpu"
+  plate_model: "models/plate_detector.pt"
+  char_model: "models/char_recognizer.pt"
+  plate_conf: 0.35
+  char_conf: 0.30
+  plate_imgsz: 960             # detect small/distant plates -> keep this large
+  char_imgsz: 320
+  max_plates_per_frame: 6
+  min_chars: 7                 # accept a plate only if at least this many chars read
+  # Half precision on GPU (faster). Ignored on CPU.
+  half: true
+  # Optional plate-crop preprocessing before recognition (default OFF — they
+  # shift the input the model trained on, so A/B test on real captures).
+  preprocess_clahe: false       # CLAHE contrast boost (low light / shadow)
+  preprocess_deskew: false      # rotate a tilted plate back to horizontal
+  # Two-stage LETTER classifier: re-decide the letter glyph with a dedicated CNN
+  # (sharper on the noisy letter than the YOLO detector). Conservative — it only
+  # overrides when it's MORE confident than YOLO, so it's neutral on clean data
+  # and only helps when YOLO is unsure (real/hard captures). Needs char_classifier.
+  two_stage_letter: true
+  char_classifier: "models/char_classifier.pt"
+
+recognition:
+  expected_chars: 8            # Iranian standard plate = 2 + letter + 3 + 2
+  # Vote each plate's reading across recent frames so a plate held in view is
+  # logged ONCE (not on every frame) and per-frame letter/digit misreads are
+  # smoothed out by majority vote. Turn off to store every raw frame read.
+  stabilize: true
+  vote_window: 2.0             # seconds of frames to vote over
+  min_votes: 4                 # frames a plate must be seen before it's logged
+  reemit_interval: 2.0         # min seconds between repeat logs of the same plate
+  track_retain: 20.0           # remember a plate this long so a brief look-away
+                               # doesn't re-log it (letter is voted over this span)
+
+storage:
+  json_path: "data/plates.json"
+  images_dir: "data/images"
+  dedup_cooldown: 60           # seconds; same plate seen again within this -> update, not new
+  max_sightings_per_plate: 50  # cap stored sightings per car
+  save_full_frame: true        # save the wide car photo
+  save_plate_crop: true        # save the cropped plate
+  jpeg_quality: 90
+
+gui:
+  window_title: "PelakYab — Iranian Plate Recognition"
+  max_live_fps: 25
+  # Persian font used to draw plate text onto frames. Point this at any .ttf
+  # that supports Persian (Vazir, IRANSans, B Nazanin, or Windows 'Tahoma').
+  persian_font: "C:/Windows/Fonts/tahoma.ttf"
+  thumbnail_size: 96

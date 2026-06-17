@@ -1,0 +1,51 @@
+# CPU smoke-test config (mirrors config.yaml but forces CPU inference).
+# Use on machines without an NVIDIA GPU:  python main.py --config config.cpu.yaml
+camera:
+  source: "http://10.48.56.252:8080"
+  stream_path: "/video"
+  snapshot_path: "/shot.jpg"
+  torch_on_path: "/enabletorch"
+  torch_off_path: "/disabletorch"
+  on_connect_requests: []
+  reconnect_delay: 2.0
+  read_timeout: 5.0
+  rotate: 0          # 0/90/180/270 clockwise (or rotate live in the GUI)
+  flip: ""           # "" | "h" | "v" | "hv"
+
+lighting:
+  enabled: true
+  low_threshold: 55
+  high_threshold: 85
+  min_toggle_interval: 4.0
+  roi: null
+  smoothing: 0.4
+
+detection:
+  device: "cpu"
+  plate_model: "models/plate_detector.pt"
+  char_model: "models/char_recognizer.pt"
+  plate_conf: 0.35
+  char_conf: 0.30
+  plate_imgsz: 960
+  char_imgsz: 320
+  max_plates_per_frame: 6
+  min_chars: 6
+  half: false
+
+recognition:
+  expected_chars: 8
+
+storage:
+  json_path: "data/plates.json"
+  images_dir: "data/images"
+  dedup_cooldown: 60
+  max_sightings_per_plate: 50
+  save_full_frame: true
+  save_plate_crop: true
+  jpeg_quality: 90
+
+gui:
+  window_title: "PelakYab — Iranian Plate Recognition (CPU)"
+  max_live_fps: 15
+  persian_font: "C:/Windows/Fonts/tahoma.ttf"
+  thumbnail_size: 96

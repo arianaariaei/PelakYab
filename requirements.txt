@@ -1,0 +1,28 @@
+# ---- Core CV / ML ----
+ultralytics>=8.3.0          # YOLOv8/YOLO11 detection (plate + characters)
+opencv-python>=4.9.0        # video capture, image ops
+numpy>=1.24
+
+# NOTE: ultralytics pulls in torch, but for GPU you should install the CUDA
+# build of torch FIRST, matching your CUDA version, e.g.:
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
+# Then: pip install -r requirements.txt
+
+# ---- Config / IO ----
+PyYAML>=6.0
+requests>=2.31              # talk to the IP Webcam HTTP API (torch on/off)
+
+# ---- GUI ----
+PySide6>=6.6               # desktop GUI (Qt)
+Pillow>=10.0               # render Persian text onto frames (cv2 can't)
+
+# ---- Persian text shaping (for drawing on frames) ----
+arabic-reshaper>=3.0.0
+python-bidi>=0.4.2
+
+# ---- App-free phone camera (camera.source: "browser") ----
+# Serves a QR-linked HTTPS page that streams the phone camera over WebSocket,
+# so no third-party phone app (e.g. IP Webcam) is needed.
+aiohttp>=3.9            # HTTPS + WebSocket server
+qrcode[pil]>=7.4        # QR code of the connect URL
+cryptography>=42.0      # self-signed cert for the LAN HTTPS server
