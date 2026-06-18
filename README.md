@@ -108,29 +108,14 @@ Datasets:
 > `LETTER_NORMALIZATION` / `DIGIT_NORMALIZATION` in
 > [`pelakyab/data/plate_types.py`](pelakyab/data/plate_types.py).
 
+
 ## 3. Connect the phone (no app)
 
 With `camera.source: "browser"` (the default), the PC shows a **QR code**; scan
 it with the phone's normal camera and the phone streams its camera in through the
 **browser** — nothing to install. Works on Android and iPhone. Run
 `python main.py` and the QR appears in the window (and console; `python main.py
---qr` shows it too). There are two modes:
-
-### Internet link — recommended (`camera.browser.tunnel: true`, default)
-
-The app creates a **public HTTPS link** via a built-in tunnel (`cloudflared`,
-auto-downloaded once into `tools/`). Scan the QR from anywhere — any Wi-Fi or
-mobile data. **No firewall, no "same Wi-Fi", and no security warning** (it's a
-real certificate). The PC just needs internet.
-
-- **On the street:** turn on the **phone's hotspot** and connect the laptop to
-  it (the laptop runs the recognition — the phone is only the camera). Then scan
-  the QR. The link takes a few seconds to appear ("Establishing secure link…").
-- On the phone: **Camera → point at QR → tap link → Start camera → Allow**.
-
-> If a network blocks Cloudflare, the app **automatically falls back** to the
-> same-Wi-Fi mode below (you'll see a note). A phone hotspot / mobile data
-> normally works fine.
+--qr` shows it too). 
 
 ### Same Wi-Fi — offline (`camera.browser.tunnel: false`)
 
@@ -140,12 +125,6 @@ self-signed certificate, so there's a little one-time setup:
 - One-time **Advanced → Proceed** tap on the phone (the cert isn't "official").
 - Double-click **`allow_phone_camera.bat`** once (opens the firewall port).
 
-### Or the IP Webcam app (Android)
-
-Set `camera.source` to the app's URL (e.g. `http://192.168.1.50:8080`).
-
-> No phone yet? Set `camera.source: "0"` to use the PC webcam just to try the
-> pipeline.
 
 ## 4. Run
 
@@ -164,7 +143,7 @@ python scripts/selftest.py     # pure-Python decode test (no GPU needed)
 
 Key knobs:
 
-- `camera.source` — `"browser"` (QR/phone), an IP Webcam URL, or `"0"` for a webcam.
+- `camera.source` — `"browser"` (QR/phone), or `"0"` for a webcam.
 - `recognition.stabilize` / `two_stage_letter` — temporal voting + CNN letter re-scoring.
 - `detection.device` — `cuda:0` or `cpu`; `plate_imgsz` large (960) helps catch
   small/distant plates.
