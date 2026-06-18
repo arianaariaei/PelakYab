@@ -4,9 +4,7 @@
 with full plate **type / province / city** decoding, JSON storage, and a desktop
 GUI that shows each car's photo, plate, and the date/time it was seen.
 
-> *PelakYab* (پلاک‌یاب) = "plate finder". Alternative names you can rename to:
-> **Didbān** (دیده‌بان, "watcher") or **PlakBin** (پلاک‌بین, "plate-seer").
-
+> *PelakYab* (پلاک‌یاب) = "plate finder".
 ---
 
 ## How it works
