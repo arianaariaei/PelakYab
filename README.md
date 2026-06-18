@@ -55,7 +55,7 @@ can use large, accurate models and a real GPU.
 ```powershell
 # clone the repo — the pretrained model weights are included, so it
 # runs out of the box with NO training required
-git clone https://github.com/<your-username>/PelakYab.git
+git clone https://github.com/arianaariaei/PelakYab.git
 cd PelakYab
 
 # (recommended) create a virtual environment
